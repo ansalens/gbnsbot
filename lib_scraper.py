@@ -148,7 +148,7 @@ def telegram(title, author, library):
         json_response = find_book(data)
     except SystemExit as err:
         print(err)
-        return "Unknown error occurred, try again!"
+        return "Unknown error occurred ❗"
     msg = parse_json(json_response, location)
     return msg
 

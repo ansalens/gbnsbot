@@ -1,9 +1,8 @@
 import logging
 from os import getenv
-from dotenv import load_dotenv
 from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, MessageHandler, filters
-from telegram.ext.filters import MessageFilter
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from dotenv import load_dotenv
 import lib_scraper
 
 
@@ -20,14 +19,6 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 3. Automatizuj na svakih pola sata izvrsavanje
 """
 
-class RequiredDataFilled(MessageFilter):
-    def filter(self, context):
-        user_data = context.user_data
-        if user_data.get('naslov') and user_data.get('biblioteka'):
-            return True
-        return False
-
-
 load_dotenv()
 TOKEN = getenv('BOT_TOKEN')
 CHOOSE, SET_VALUE, SEARCH = range(3)
@@ -36,13 +27,13 @@ indexed = lib_scraper.indexed
 
 async def showOptions(update, context):
     options = [["Naslov", "Autor", "Biblioteka", "Pretrazi"]]
-    markup_options = ReplyKeyboardMarkup(options, one_time_keyboard=True)
-    await update.message.reply_text('Izaberi opciju:', reply_markup=markup_options)
+    markup_options = ReplyKeyboardMarkup(options, resize_keyboard=True, one_time_keyboard=True)
+    await update.message.reply_text('Izaberi opciju za podesavanje', reply_markup=markup_options)
+    return CHOOSE
 
 
 async def start(update, context):
-    await showOptions(update, context)
-    return CHOOSE
+    return await showOptions(update, context)
 
 
 async def makeChoice(update, context):
@@ -56,8 +47,9 @@ async def makeChoice(update, context):
         await update.message.reply_text("Unesi naslov knjige.")
     elif text == 'biblioteka':
         library = [["1", "2"]]
-        markup = ReplyKeyboardMarkup(library, one_time_keyboard=True)
-        msg = "Biblioteke:\n"
+        markup = ReplyKeyboardMarkup(library, resize_keyboard=True, one_time_keyboard=True)
+        msg = "Biblioteke u ponudi\n"
+        
         for index, lib in indexed.items():
             msg += f"{index}) {lib[0]}\n-> {lib[1]}\n-> {lib[2]}\n"
 
@@ -67,7 +59,9 @@ async def makeChoice(update, context):
             await update.message.reply_text("Pretrazujem...")
             await search(update, context)
         else:
-            await update.message.reply_text("Potrebno uneti ime knjige i izabrati biblioteku!")
+            await update.message.reply_text("Potrebno uneti ime knjige i izabrati biblioteku ⚠")
+            return CHOOSE
+    
     
     return SET_VALUE
 
@@ -75,6 +69,8 @@ async def makeChoice(update, context):
 async def recordData(update, context):
     text = update.message.text
     user_data = context.user_data
+    if not user_data.get('choice'):
+        return await showOptions(update, context)
     data = user_data['choice']
     user_data[data] = text
     del user_data['choice']
@@ -84,14 +80,11 @@ async def recordData(update, context):
         msg += f"{key} -> {value}\n"
     
     await update.message.reply_text(msg)
-    await showOptions(update, context)
+    return await showOptions(update, context)
     
-    return CHOOSE
-
 
 async def search(update, context):
     user_data = context.user_data
-
     _ = user_data['biblioteka']
     library = lib_scraper.libraries[indexed[_][0]]
     title = user_data['naslov']
@@ -102,17 +95,19 @@ async def search(update, context):
         author = ''
 
     msg = lib_scraper.telegram(title, author, library)
+    
     if msg:
         await update.message.reply_text(msg, reply_markup=ReplyKeyboardRemove())
     else:
         await update.message.reply_text(f"{title} | {indexed[_][0]} - NEDOSTUPNA")
 
     user_data.clear()
+    
     return ConversationHandler.END
 
 
 async def cancel(update, context):
-    await update.message.reply_text("Pretraga zaustavljena", reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text("Pretraga zaustavljena ⚠", reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
 
@@ -132,4 +127,5 @@ def main():
     bot.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
-main()
+if __name__ == '__main__':
+    main()
