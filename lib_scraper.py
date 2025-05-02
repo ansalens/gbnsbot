@@ -124,7 +124,7 @@ def find_book(data):
     try:
         r = requests.post(URL, json=data, headers=headers, timeout=5)
         if len(r.text) == 0:
-            raise SystemExit('Error: Book not found')
+            return -1
         r.raise_for_status()
         jsr = r.json()
     except requests.HTTPError as http_err:
@@ -146,9 +146,11 @@ def telegram(title, author, library):
     data, location = prepare_data(title, author, library)
     try:
         json_response = find_book(data)
+        if json_response == -1:
+            return "Knjiga nije pronadjena ⚠"
     except SystemExit as err:
         print(err)
-        return "Unknown error occurred ❗"
+        return "Nazalost desila se greska ‼"
     msg = parse_json(json_response, location)
     return msg
 
