@@ -16,7 +16,6 @@ AGENTS = [
     'Mozilla/5.0 (Linux; Android 12; moto e22i Build/SOWS32.121-44-3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5860.2 Safari/537.36'
     ]
 URL = "https://opac.bisis.rs/sr-Latn/bisisWS/opac/search"
-# figure out how it breaks into 404 when removing certain headers
 headers = {'Content-Type': 'application/json',
            'Host': 'opac.bisis.rs',
            'Library': 'gbns',
@@ -40,7 +39,7 @@ def prepare_data(title, author, library) -> (dict, str):
 
     Returns
     -------
-        JSON edited data for a request
+        JSON data for a future request
         Location code for chosen library for further use
     """
     data = '{"searchModel":{"branches":[],"departments":[],"oper1":"AND","oper2":"AND","oper3":"AND","oper4":"AND","oper5":"AND","pref1":"AU","pref2":"TI","pref3":"LA","pref4":"PU","pref5":"PY","sort":"","text1":"","text2":"","text3":"srp","text4":"","text5":""},"options":{"pageSize":10,"currentPage":1,"filters":{"pubTypes":[],"pubYears":[],"languages":[],"authors":[],"locations":[],"subLocations":[],"subjects":[]},"sort":{"type":"PY_sort","ascending":false},"previewType":null,"lib":"gbns"}}'
@@ -115,8 +114,8 @@ def check_available(ids: list, library: str):
                     #    print('Status: NEDOSTUPNA')
                     if status == 'FREE':
                         url = f'https://opac.bisis.rs/sr-Latn/book/gbns/{_id}'
-                        status = 'Status: DOSTUPNA'
-                        msg = f'{url}\n{status}'
+                        status = 'DOSTUPNA ✅'
+                        msg = f'{status}\n{url}'
                         return msg
 
 
