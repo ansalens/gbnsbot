@@ -1,12 +1,12 @@
 import logging
 from os import getenv
 from telegram.ext import (ApplicationBuilder, filters,
-                          CommandHandler, ConversationHandler, MessageHandler,)
+                          CommandHandler, ConversationHandler, MessageHandler)
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from dotenv import load_dotenv
 import lib_scraper
-from random import randint
 
+# from random import randint
 
 logging.basicConfig(
     filename='bot.log',
@@ -17,22 +17,16 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 
-
-"""TO-DO:
-*. Automatski prelazak na library funkciju bez /library
-*. Ispisivanje greski na ekran umesto ubijanje programa
-*. Automatizuj na svakih pola sata izvrsavanje
-"""
-
 load_dotenv()
 TOKEN = getenv('BOT_TOKEN')
+REMIND_DURATION = 1800
 CHOOSE, SET_VALUE = range(2)
-REMIND_SLEEP = 1800
-indexed = lib_scraper.indexed
+indexed = {'1': ('Danilo Kis', 'Narodnog Fronta 47', 'Pon-Pet 07:30-20:00'),
+           '2': ('Djura Danicic', 'Dunavska 1', 'Pon-Pet 07:30-20:00\nSub 08:00-14:00')}
 searching = {}
 
 
-async def show_options(update, context):
+async def show_options(update, _):
     options = [["Naslov", "Autor", "Biblioteka", "Pretrazi"]]
     markup_options = ReplyKeyboardMarkup(options, resize_keyboard=True, one_time_keyboard=True)
     await update.message.reply_text('Izaberi opciju za podesavanje ⬇️', reply_markup=markup_options)
@@ -100,7 +94,7 @@ async def search(update, context):
         msg += f"\n🔸 {author} ✒"
 
     await update.message.reply_text(msg)
-    results = lib_scraper.telegram(title, author, library)
+    results = lib_scraper.telegram_search(title, author, library)
     user_data['available'] = False
 
     if results:
@@ -125,7 +119,7 @@ async def reminder(context):
     if user_data.get('autor'):
         author = user_data['autor']
     
-    results = lib_scraper.telegram(title, author, library)
+    results = lib_scraper.telegram_search(title, author, library)
 
     if results:
         user_data['available'] = True
@@ -153,19 +147,19 @@ async def callback_reminder(update, context):
     if not title or not lib:
         await update.message.reply_text("Potrebno uneti ime knjige i izabrati biblioteku ⚠")
     elif not searching.get('available'):
-        context.job_queue.run_repeating(reminder, interval=REMIND_SLEEP, chat_id=chat_id, data=searching)
-        await update.message.reply_text(f"Proveravam ponovo svakih {int(REMIND_SLEEP / 60)} minuta.")
+        context.job_queue.run_repeating(reminder, interval=REMIND_DURATION, chat_id=chat_id, data=searching)
+        await update.message.reply_text(f"Proveravam ponovo svakih {int(REMIND_DURATION / 60)} minuta.")
     else:
         await update.message.reply_text(f"Knjiga \"{title}\" je vec dostupna u biblioteci {indexed[lib][0]}.")
 
 
-async def cancel(update, context):
+async def cancel(update, _):
     await update.message.reply_text("Pretraga zaustavljena ⚠", reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
 
 def main():
-    bot = ApplicationBuilder().token(TOKEN).build()    
+    bot = ApplicationBuilder().token(TOKEN).build()
     flow_handler = ConversationHandler(
             entry_points=[CommandHandler("start", start)],
             states = {
