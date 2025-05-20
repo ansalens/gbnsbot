@@ -3,6 +3,19 @@ from time import sleep
 import json
 import requests
 
+"""Module for communicating with library webserver.
+
+This module serves as a library scraper.
+
+
+Constants
+---------
+    URL - URL for library's search functionality.
+    SLEEP_DURATION - Number of seconds to sleep until next request is sent.
+    AGENTS - Random User Agents for evading blocking mechanism.
+    headers - Request headers, on every request, random UA is chosen.
+    libraries - Name of libraries, along with their necessary data for a request.
+"""
 URL = "https://opac.bisis.rs/sr-Latn/bisisWS/opac/search"
 SLEEP_DURATION = 1
 AGENTS = [
@@ -27,7 +40,8 @@ headers = {'Content-Type': 'application/json',
            'Connection': 'keep-alive'
            }
 libraries = {'Danilo Kis': {"item": {"label": "Данило Киш", "value": "27", "checked": True}, "type": 0},
-             'Djura Danicic': {"item": {"label": "Ђура Даничић", "value": "01", "checked": True}, "type": 0}
+             'Djura Danicic': {"item": {"label": "Ђура Даничић", "value": "01", "checked": True}, "type": 0},
+             'Petefi Sandor': {"item": {"label": "Петефи Шандор", "value": "03", "checked": True}, "type": 0}
              }
 
 
@@ -141,7 +155,7 @@ def find_book(data: dict) -> dict:
         if len(r.text) == 0:
             return 0
         raise SystemExit(f"JSON Error: {json_err}") from json_err
-    #print(json_response)
+
     return json_response
 
 
@@ -168,13 +182,13 @@ def parse_json(json_response: dict, library: str):
     return msg
 
 
-def telegram_search(title, author, library) -> str:
+def telegram_search(title: str, author: str, library: str) -> str:
     """Search for a book in a library. Bundle function for telegram bot.
     
     This function bundles whole module functionality in order to search for
     the book in a library. Data preparation is first step, next is searching
-    for the book and finally returning a message depending if it can be borrowed
-    or not.
+    for the book and finally returning a message depending if it can be
+    borrowed or not.
     
     Arguments
     ---------
