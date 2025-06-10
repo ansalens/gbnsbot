@@ -39,9 +39,9 @@ headers = {'Content-Type': 'application/json',
            'Refer': 'https://opac.bisis.rs/sr-Cyrl/search/result?s=70f3b2200c8d68e2b134524a2d',
            'Connection': 'keep-alive'
            }
-libraries = {'Danilo Kis': {"item": {"label": "Данило Киш", "value": "27", "checked": True}, "type": 0},
-             'Djura Danicic': {"item": {"label": "Ђура Даничић", "value": "01", "checked": True}, "type": 0},
-             'Petefi Sandor': {"item": {"label": "Петефи Шандор", "value": "03", "checked": True}, "type": 0}
+libraries = {'Danilo Kiš': {"item": {"label": "Данило Киш", "value": "27", "checked": True}, "type": 0},
+             'Đura Daničić': {"item": {"label": "Ђура Даничић", "value": "01", "checked": True}, "type": 0},
+             'Petefi Šandor': {"item": {"label": "Петефи Шандор", "value": "03", "checked": True}, "type": 0}
              }
 
 

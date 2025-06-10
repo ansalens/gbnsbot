@@ -16,9 +16,9 @@ from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from dotenv import load_dotenv
 import lib_scraper
 
-indexed = {"1": ("Danilo Kis", "Narodnog Fronta 47", "Pon-Pet 07:30-20:00"),
-           "2": ("Djura Danicic", "Dunavska 1", "Pon-Pet 07:30-20:00"),
-           "3": ("Petefi Sandor", "Jozefa Atile 16", "Pon-Pet 07:30-20:00")
+indexed = {"1": ("Danilo Kiš", "Narodnog Fronta 47", "Pon-Pet 07:30-20:00"),
+           "2": ("Đura Daničić", "Dunavska 1", "Pon-Pet 07:30-20:00"),
+           "3": ("Petefi Šandor", "Jožefa Atile 16", "Pon-Pet 07:30-20:00")
           }
 CHOOSE, SET_VALUE = range(2)
 REMIND_DURATION = 1800
