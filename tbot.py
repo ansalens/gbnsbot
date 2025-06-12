@@ -155,12 +155,12 @@ async def search(update, context):
     selected_lib = user_data["biblioteke"]
     library_name = indexed[selected_lib][0]
     library = lib_scraper.libraries[library_name]
-    msg = f"Pretrazujem 🔎\n🔸 {title} 📕\n🔸 {library_name} 🏫"
+    msg = f"Pretrazujem 🔎\n▫️ {title} 📗\n▫️ {library_name} 🏫"
 
     author = ""
     if user_data.get("autor"):
         author = user_data["autor"]
-        msg += f"\n🔸 {author} ✒"
+        msg += f"\n▫️ {author} ✒"
 
     await update.message.reply_text(msg)
     results = lib_scraper.telegram_search(title, author, library)
@@ -170,7 +170,7 @@ async def search(update, context):
         await update.message.reply_text(results, reply_markup=ReplyKeyboardRemove())
         user_data["available"] = True
     else:
-        await update.message.reply_text(f"{title} | {library_name} - NEDOSTUPNA")
+        await update.message.reply_text(f"🔻 NEDOSTUPNA ❌\n🔻 {title} 📕\n🔻 {library_name} 🏫\nℹ️ /remind za podsetnik")
 
     if user_data.get("autor"):
         del user_data["autor"]

@@ -23,11 +23,16 @@ sudo apt install python3-pip
 python3 -m pip install --upgrade pip
 ```
 
-### Installing virtualenv and creating new virtual environment
-- If virtualenv is already present skip this step.
+### Installing virtualenv 
+- If virtualenv is already present skip installing.
 
 ```sh
 pip install virtualenv
+```
+
+### Creating new virtual environment
+
+```sh
 cd libscraper; virtualenv .venv
 source .venv/bin/activate
 ```
