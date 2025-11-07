@@ -4,7 +4,7 @@ Constants
 ---------
     TOKEN - Your telegram bot token, loaded from .env.
     REMIND_DURATION - Number of seconds to wait before checking again on the book.
-    CHOOSE, SET_VALUE - Integer numbers that signal the state of conversation with the bot.
+    CHOOSE, SET_VALUE - Integer numbers that signals the state of conversation with the bot.
     indexed - Some basic information about libraries (name, address, work hours).
     searching - Used for storing info about the book that user wants to be reminded of.
 """
@@ -196,21 +196,11 @@ async def reminder(context):
         author = user_data["autor"]
     
     results = lib_scraper.telegram_search(title, author, library)
-
     if results:
         user_data["available"] = True
         context.job.schedule_removal()
         msg = f"{title} 📕\n{library_name} 🏫\n{results}"
         await context.bot.send_message(context.job.chat_id, msg)
-
-    """
-    randomly = randint(0, 1)
-    if randomly > 0:
-        user_data['available'] = True
-        context.job.schedule_removal()
-        msg = f"{title} | {library_name} - DOSTUPNA!"
-        await context.bot.send_message(context.job.chat_id, msg)
-    """
 
 
 async def callback_reminder(update, context):
@@ -226,14 +216,13 @@ async def callback_reminder(update, context):
     ---------
         update - For sending a message to the user and passing user's chat id.
         context - For running job queue and copying user's data into `searching`.
-
     """
     global searching
     searching = context.user_data.copy()
     chat_id = update.effective_message.chat_id
     title = searching.get("naslov")
     lib = searching.get("biblioteke")
-    
+
     if not title or not lib:
         await update.message.reply_text("Potrebno uneti ime knjige i izabrati biblioteku ⚠")
     elif not searching.get("available"):
